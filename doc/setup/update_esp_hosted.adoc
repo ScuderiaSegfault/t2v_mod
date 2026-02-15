@@ -1,0 +1,130 @@
+= Update ESP32C6 `esp_hosted` firmware
+
+The ESP32P4-Nano board uses a second ESP32C6 chip for wireless functionality.
+As the wireless connection is used for testing and configuration, we need to properly set up the coprocessor with the same version as the T2V firmware is using.
+
+For this you need:
+
+* ESP32P4-Nano (or similar board)
+* USB-C cable
+* Working ESP-IDF setup
+
+NOTE: This guide is taken from https://github.com/chvvkumar/ESP32-P4-Allsky-Display/blob/main/docs/05_ota_updates.md#appendix-esp32-c6-co-processor-updates with slight modifications where necessary.
+
+NOTE: In case you use a different board, make sure you compile the firmwares for the correct chips.
+
+In this guide we will use the ESP32P4 to update the firmware of the ESP32C6.
+This update path requires us to build both the new firmware for the coprocessor and an OTA updating firmware for the ESP32P4.
+We will be careful to indicate which step is done for which chip, but please be careful when performing this update.
+
+== Building the C6 firmware
+
+Start by creating a directory for compiling the C6 firmware and initialize the project in this directory.
+Make sure that you have sourced ESP-IDF in your shell, otherwise `idf.py` will not be available.
+
+[source,bash]
+----
+mkdir esp_hosted_c6 & cd esp_hosted_c6
+idf.py create-project-from-example "espressif/esp_hosted^2.11.7:slave" & cd slave
+----
+
+Then set the correct target for the coprocessor.
+
+[source,bash]
+----
+idf.py set-target esp32c6
+----
+
+Then we can start building. This build shouldn't take that long.
+
+[source,bash]
+----
+idf.py build
+----
+
+In the end you will be presented with the firmware for the C6, which should be located at `build/network_adapter.bin`.
+
+== Building the P4 OTA firmware
+
+This firmware runs on our main chip and performs the update of the coprocessor.
+Start by leaving the directory of the C6 firmware, clone the source of the `esp-hosted-mcu` and copy the OTA update example.
+
+[source,bash]
+----
+git clone https://github.com/espressif/esp-hosted-mcu.git
+cp -r esp-hosted-mcu/examples/host_performs_slave_ota ota_firmware & cd ota_firmware
+----
+
+We clean the firmware project and configure the correct host chip.
+
+[source,bash]
+----
+idf.py fullclean  # does nothing if you build it the first time
+rm sdkconfig sdkconfig.old  # same
+
+idf.py set-target esp32p4
+----
+
+Next, we copy over the C6 firmware, so we can create a partition in the P4 firmware that stores the new C6 firmware.
+
+[source,bash]
+----
+mkdir -p components/ota_partition/slave_fw_bin
+cp ../slave/build/network_adapter.bin components/ota_partition/slave_fw_bin
+----
+
+Then we need to configure the correct update method.
+Run
+
+[source,bash]
+----
+idf.py menuconfig
+----
+
+and then select `Partition OTA` in the menu `ESP-Hosted Slave OTA Config > Select OTA Method`.
+
+Save (kbd:[S]) and close (kbd:[Q]) `menuconfig` and start building the P4 firmware.
+
+[source,bash]
+----
+idf.py build
+----
+
+== Flashing and Updating
+
+To perform the update simply flash the main chip and let it do all the work.
+
+[source,bash]
+----
+idf.py flash monitor
+----
+
+Running this will first flash the main chip and then open a serial monitor of the OTA process.
+If you run this for an early version of the coprocessors firmware, you might see message like this.
+(You can safely ignore them)
+
+[source]
+----
+W () transport: Version mismatch: Host [2.11.0] > Co-proc [0.0.0] ==> Upgrade co-proc to avoid RPC timeouts
+W () rpc_core: Timeout waiting for Resp for [0x15e](Req_GetCoprocessorFwVersion)
+E () rpc_core: Response not received for [0x15e](Req_GetCoprocessorFwVersion)
+W () host_performs_slave_ota: Could not get slave firmware version (error: ESP_FAIL)
+W () host_performs_slave_ota: Proceeding without version compatibility check
+W () host_performs_slave_ota: Starting OTA via Partition
+W () host_performs_slave_ota: Partition label: slave_fw
+W () ota_partition: Could not get current slave firmware version (error: ESP_FAIL), proceeding with OTA
+W () host_performs_slave_ota: Restarting host to resync with slave...
+----
+
+After successfully updating the coprocessor the whole system will reboot.
+At the end of the reboot, you should see the following messages.
+
+[source]
+----
+I () host_performs_slave_ota: Host firmware version: 2.11.7
+I () host_performs_slave_ota: Slave firmware version: 2.11.7
+I () host_performs_slave_ota: Versions compatible - OTA not required
+----
+
+If you see these messages the update was successful, and you can continue with the setup guide.
+(To leave the monitor use kbd:[Ctrl,\]])

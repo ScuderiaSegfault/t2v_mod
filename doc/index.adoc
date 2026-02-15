@@ -1,0 +1,9 @@
+= Track to Vehicle Module
+Felix Resch <felix.resch@tuwien.ac.at>
+
+This document provides setup instructions and technical details on the RoboRacer _Track to Vehicle_ (T2V) module.
+For setting up your own module, please refer to section setup.
+If you want to extend the module or build modifications on top of it, please refer to section technical details.
+
+
+include::setup/index.adoc[leveloffset=1]

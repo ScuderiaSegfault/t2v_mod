@@ -1,0 +1,5 @@
+= Setup
+
+include::update_esp_hosted.adoc[leveloffset=+1]
+
+include::build_and_flash.adoc[leveloffset=+1]

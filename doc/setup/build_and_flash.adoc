@@ -1,0 +1,44 @@
+= Build and Flash
+
+The firmware for the T2V module can be found at RELEASETODO and offers a wide range of configuration options.
+For more details on all options refer to the configuration section.
+
+To build the firmware clone the source, checkout the latest release and configure it according to your needs.
+
+[source,bash]
+----
+git clone RELEASETODO & cd t2v_mod_fw
+git checkout v0.1.0-alpha
+
+idf.py set-target esp32p4
+idf.py menuconfig
+----
+
+In `menuconfig` you can navigate to `T2V Module`, which contains all configuration options specifically for the T2V module.
+We provide two configuration presets, one for a reference receiver and one for the reference sender.
+The reference receiver provides the minimal configuration required for the T2V module to act as a receiver for T2V communication.
+You can select additional capabilities by activating the corresponding tasks in the tasks submodule.
+
+To allow for bluetooth configuration, navigate to `T2V Module → Tasks → BLE Task` and configure the settings for your car.
+
+By convention use the following format for the `Device Name`: `[<team short name>] <car id>`
+Make sure that the `Device Name` does not exceed 16 bytes. You might have to shorten your car id too.
+`Car ID` and `Team Name` you can pick freely, but please provide values that match other data you would use at a competition.
+
+Save the configuration by pressing kbd:[S] and then kbd:[Q].
+
+Next we can build the firmware.
+
+[source,bash]
+----
+idf.py build
+----
+
+Depending on the selected configuration this might take some time.
+
+After the build has been successful you can flash your board and start using it.
+
+[source,bash]
+----
+idf.py flash monitor
+----
