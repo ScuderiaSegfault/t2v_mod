@@ -1,5 +1,15 @@
 = Setup
 
+== ESP-IDF
+
+To compile the firmware you need the development tools made by Espressif, the manufacturer of the chip.
+Detailed instructions for setting up the framework can be found at: https://docs.espressif.com/projects/esp-idf/en/release-v5.5/esp32p4/get-started/index.html
+On Linux/MacOS systems you will need to run step 4 of the instructions in each shell you wish to work with the framework.
+
+The firmware currently uses version 5.5 of the framework with commit hash `8c750b088c7cd857d079c0eeb495da199b359461` definitely known to be working.
+Normally the framework remains quite stable, but some cutting-edge features might break between minor releases.
+Please report any breaking changes, if you notice them.
+
 include::update_esp_hosted.adoc[leveloffset=+1]
 
 include::build_and_flash.adoc[leveloffset=+1]
