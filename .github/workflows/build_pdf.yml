@@ -16,7 +16,13 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
         
-      - name: 'Build PDF'
+      - name: 'Build Doc'
         uses: thesis/asciidoctor-action@v1
         with:
           files: doc/index.adoc
+
+      - name: Export Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc
+          path: /github/workspace/asciidoc-out
