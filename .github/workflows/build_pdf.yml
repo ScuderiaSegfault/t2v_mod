@@ -18,11 +18,13 @@ jobs:
         
       - name: 'Build Doc'
         uses: thesis/asciidoctor-action@v1
+        id: build
         with:
+          format: 'pdf'  
           files: doc/index.adoc
 
       - name: Export Artifact
         uses: actions/upload-artifact@v4
         with:
           name: doc
-          path: doc/
+          path: ${{ steps.build.outputs.asciidoctor-artifacts }}
