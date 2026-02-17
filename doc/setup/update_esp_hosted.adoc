@@ -24,8 +24,8 @@ Make sure that you have sourced ESP-IDF in your shell, otherwise `idf.py` will n
 
 [source,bash]
 ----
-mkdir esp_hosted_c6 & cd esp_hosted_c6
-idf.py create-project-from-example "espressif/esp_hosted^2.11.7:slave" & cd slave
+mkdir esp_hosted_c6 && cd esp_hosted_c6
+idf.py create-project-from-example "espressif/esp_hosted^2.11.7:slave" && cd slave
 ----
 
 Then set the correct target for the coprocessor.
@@ -42,6 +42,7 @@ Then we can start building. This build shouldn't take that long.
 idf.py build
 ----
 
+Building this firmware will print out some warnings but you can ignore them.
 In the end you will be presented with the firmware for the C6, which should be located at `build/network_adapter.bin`.
 
 == Building the P4 OTA firmware
@@ -51,8 +52,8 @@ Start by leaving the directory of the C6 firmware, clone the source of the `esp-
 
 [source,bash]
 ----
-git clone https://github.com/espressif/esp-hosted-mcu.git
-cp -r esp-hosted-mcu/examples/host_performs_slave_ota ota_firmware & cd ota_firmware
+cd .. && git clone https://github.com/espressif/esp-hosted-mcu.git
+cp -r esp-hosted-mcu/examples/host_performs_slave_ota ota_firmware && cd ota_firmware
 ----
 
 We clean the firmware project and configure the correct host chip.
@@ -81,9 +82,9 @@ Run
 idf.py menuconfig
 ----
 
-and then select `Partition OTA` in the menu `ESP-Hosted Slave OTA Config > Select OTA Method`.
+and then in the menu `ESP-Hosted Slave OTA Config > Select OTA Method` select `Partition OTA`.
 
-Save (kbd:[S]) and close (kbd:[Q]) `menuconfig` and start building the P4 firmware.
+Save (`S`) and close (`Q`) `menuconfig` and start building the P4 firmware.
 
 [source,bash]
 ----
@@ -127,4 +128,4 @@ I () host_performs_slave_ota: Versions compatible - OTA not required
 ----
 
 If you see these messages the update was successful, and you can continue with the setup guide.
-(To leave the monitor use kbd:[Ctrl,\]])
+(To leave the monitor use `Ctrl+]`)

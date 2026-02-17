@@ -10,6 +10,17 @@ The firmware currently uses version 5.5 of the framework with commit hash `8c750
 Normally the framework remains quite stable, but some cutting-edge features might break between minor releases.
 Please report any breaking changes, if you notice them.
 
+To checkout the exact version we used for testing, run the following commands in the `esp-idf` directory.
+
+[source,bash]
+----
+git reset --hard 8c750b088c7cd857d079c0eeb495da199b359461
+git submodule update --init --recursive
+----
+
+You need tooling for ESP32P4 and ESP32C6.
+As they both use the same architecture, it should be fine if you only install ESP32P4.
+
 include::update_esp_hosted.adoc[leveloffset=+1]
 
 include::build_and_flash.adoc[leveloffset=+1]
