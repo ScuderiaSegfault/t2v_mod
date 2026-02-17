@@ -25,4 +25,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: doc
-          path: /github/workspace/asciidoc-out
+          path: /github/workspace/asciidoc-out/doc/
